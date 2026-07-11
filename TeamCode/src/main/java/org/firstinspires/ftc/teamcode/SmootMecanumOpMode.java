@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -10,7 +11,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-
+@TeleOp(name="SmoothMecanumOpMode")
 public class SmootMecanumOpMode extends LinearOpMode {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -52,25 +53,31 @@ public class SmootMecanumOpMode extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
+
+        double brPower = 0.0;
+        double blPower = 0.0;
+        double frPower = 0.0;
+        double flPower = 0.0;
+
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
             Pose2D pos = odo.getPosition();
 
             // Setup a variable for each drive wheel to save power level for telemetry
-            double brPower;
-            double blPower;
-            double frPower;
-            double flPower;
 
             double drive = -gamepad1.left_stick_y;
             double strafe  =  gamepad1.left_stick_x;
             double spin = - gamepad1.right_stick_y;
             double turn = gamepad1.right_stick_x;
-            brPower = Range.clip(drive+strafe, -1.0, 1.0);
-            blPower = Range.clip(drive-strafe, -1.0, 1.0);
-            frPower = Range.clip(drive-strafe, -1.0, 1.0);
-            flPower = Range.clip(drive+strafe, -1.0, 1.0);
+
+            double xp = odo.getVelX(DistanceUnit.MM);
+            double yp = odo.getVelY(DistanceUnit.MM);
+
+            flPower -= (yp-(flPower*1000))/10000;
+            blPower -= (yp-(flPower*1000))/10000;
+            frPower -= (yp-(flPower*1000))/10000;
+            brPower -= (yp-(flPower*1000))/10000;
 
             // Send calculated power to wheels
             backrightMotor.setPower(brPower);
@@ -84,6 +91,7 @@ public class SmootMecanumOpMode extends LinearOpMode {
             telemetry.addData("Back Motors", "BL (%.2f), BR (%.2f)", blPower, brPower);
             telemetry.addData("Odometry", "X: %.2f, Y: %.2f, H: %.2f", pos.getX(DistanceUnit.MM), pos.getY(DistanceUnit.MM), pos.getHeading(AngleUnit.DEGREES));
             telemetry.update();
+            odo.update();
         }
     }
 }
