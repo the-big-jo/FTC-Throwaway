@@ -96,7 +96,6 @@ public class FieldCentricMecanumDrive extends LinearOpMode {
             // fetch data from odometry and limelight
             odo.update();
             Pose2D pos = odo.getPosition();
-            LLResult result = limelight.getLatestResult();
 
             // field centric drive
             double drive = -gamepad1.left_stick_y;
@@ -139,7 +138,6 @@ public class FieldCentricMecanumDrive extends LinearOpMode {
             telemetry.addData("Front Motors", "FL (%.2f), FR (%.2f)", flPower, frPower);
             telemetry.addData("Back Motors", "BL (%.2f), BR (%.2f)", blPower, brPower);
             telemetry.addData("Odometry", "X: %.2f, Y: %.2f, H: %.2f", pos.getX(DistanceUnit.MM), pos.getY(DistanceUnit.MM), pos.getHeading(AngleUnit.DEGREES));
-            telemetry.addData("Limelight", "Pipeline: ", result.getPipelineIndex());
             telemetry.update();
 
             // update dt
